@@ -1,0 +1,7 @@
+interface:
+  display_name: "Azure SVG Diagram"
+  short_description: "Generate SVG Azure architecture diagrams"
+  default_prompt: "Use $azure-svg-diagram to draw an Azure architecture diagram from this description."
+
+policy:
+  allow_implicit_invocation: true
