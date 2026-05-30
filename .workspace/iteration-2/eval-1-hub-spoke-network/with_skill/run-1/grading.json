@@ -1,0 +1,55 @@
+{
+  "expectations": [
+    {
+      "text": "Output SVG exists and parses as valid XML",
+      "passed": true,
+      "evidence": "ET parsed root successfully"
+    },
+    {
+      "text": "SVG uses official Microsoft Firewall icon",
+      "passed": true,
+      "evidence": "symbol icon-firewalls with 18 elements"
+    },
+    {
+      "text": "SVG uses official Microsoft Bastion icon",
+      "passed": true,
+      "evidence": "symbol icon-bastions with 12 elements"
+    },
+    {
+      "text": "SVG uses official Microsoft Kubernetes Services (AKS) icon",
+      "passed": true,
+      "evidence": "symbol icon-kubernetes-services with 40 elements"
+    },
+    {
+      "text": "SVG uses official Microsoft Cosmos DB icon",
+      "passed": true,
+      "evidence": "symbol icon-azure-cosmos-db with 16 elements"
+    },
+    {
+      "text": "SVG uses official Microsoft Function Apps icon",
+      "passed": true,
+      "evidence": "symbol icon-function-apps with 16 elements"
+    },
+    {
+      "text": "SVG shows three distinct resource-group container boundaries (hub, app-prod, data)",
+      "passed": true,
+      "evidence": "6 container-style rects (wanted >= 3)"
+    },
+    {
+      "text": "SVG includes at least one dashed edge representing vnet peering",
+      "passed": true,
+      "evidence": "2 dashed paths"
+    },
+    {
+      "text": "SVG is more than 8 KB",
+      "passed": true,
+      "evidence": "file size 16754 bytes (threshold 8192)"
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.0
+  }
+}

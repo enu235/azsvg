@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "hub-spoke-network",
+  "prompt": "draw the hub-and-spoke we discussed yesterday so I can put it in tomorrow's design doc. hub vnet (10.0.0.0/22) has azure firewall (premium) and bastion, in rg-net-hub. two spokes — rg-app-prod has an aks cluster (System+User node pools), and rg-data has cosmos db (provisioned) plus a function app on consumption. all peered to hub. egress flows through the firewall. save it to /tmp/hub-spoke.svg.",
+  "assertions": [
+    {"text": "Output SVG exists and parses as valid XML", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft Firewall icon", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft Bastion icon", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft Kubernetes Services (AKS) icon", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft Cosmos DB icon", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft Function Apps icon", "kind": "programmatic"},
+    {"text": "SVG shows three distinct resource-group container boundaries (hub, app-prod, data)", "kind": "programmatic"},
+    {"text": "SVG includes at least one dashed edge representing vnet peering", "kind": "programmatic"},
+    {"text": "SVG is more than 8 KB", "kind": "programmatic"}
+  ]
+}

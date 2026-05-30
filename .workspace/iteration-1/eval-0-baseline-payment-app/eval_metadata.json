@@ -1,0 +1,14 @@
+{
+  "eval_id": 0,
+  "eval_name": "baseline-payment-app",
+  "prompt": "ok i'm writing up an arch review for our team — we're moving the contoso payment service to azure. it'll be an app service (P2v3, just westus2 for now, multi-region later), backing onto an azure sql db (general purpose), with private endpoints between them. key vault holds the connection strings, app insights for telemetry. one resource group (rg-payment-prod), one vnet (10.20.0.0/16) with two subnets — snet-app and snet-data. can you draw me an svg architecture diagram I can paste into the doc?",
+  "assertions": [
+    {"text": "Output file diagram.svg exists and parses as valid XML", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft App Service icon (contains <symbol id=\"icon-app-services\"> or <use href=\"#icon-app-services\">)", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft SQL Database icon", "kind": "programmatic"},
+    {"text": "SVG uses official Microsoft Key Vault and Application Insights icons", "kind": "programmatic"},
+    {"text": "SVG renders distinct nested container boundaries for the resource group, vnet, and at least one subnet (visible as nested <rect> elements with stroke)", "kind": "programmatic"},
+    {"text": "SVG includes labeled edges between App Service and SQL (text mentions 'private endpoint' or similar)", "kind": "programmatic"},
+    {"text": "SVG is more than 6 KB (indicating non-trivial inlined icon content, not just labeled rectangles)", "kind": "programmatic"}
+  ]
+}

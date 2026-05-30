@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 720" font-family="Segoe UI, Arial, sans-serif" font-size="13">
+  <!-- Background -->
+  <rect width="1100" height="720" fill="#f7f9fc"/>
+
+  <!-- Title -->
+  <text x="550" y="34" text-anchor="middle" font-size="20" font-weight="bold" fill="#243a5e">Contoso Payment Service - Azure Architecture (Prod)</text>
+  <text x="550" y="54" text-anchor="middle" font-size="12" fill="#5a6678">Region: West US 2  |  Resource Group: rg-payment-prod</text>
+
+  <!-- Subscription / Resource Group boundary -->
+  <rect x="40" y="80" width="1020" height="600" rx="10" ry="10" fill="#ffffff" stroke="#0078d4" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="60" y="102" font-size="13" font-weight="bold" fill="#0078d4">Resource Group: rg-payment-prod  (Region: westus2)</text>
+
+  <!-- VNet boundary -->
+  <rect x="70" y="130" width="780" height="500" rx="10" ry="10" fill="#eef4fb" stroke="#1f6feb" stroke-width="2"/>
+  <text x="90" y="152" font-size="13" font-weight="bold" fill="#1f6feb">VNet: vnet-payment-prod  (10.20.0.0/16)</text>
+
+  <!-- snet-app subnet -->
+  <rect x="100" y="180" width="320" height="410" rx="8" ry="8" fill="#ffffff" stroke="#5b9bd5" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="115" y="202" font-size="12" font-weight="bold" fill="#1f6feb">Subnet: snet-app  (10.20.1.0/24)</text>
+
+  <!-- App Service Plan box -->
+  <rect x="125" y="225" width="270" height="170" rx="6" ry="6" fill="#f0f6ff" stroke="#0078d4" stroke-width="1"/>
+  <text x="140" y="245" font-size="11" font-weight="bold" fill="#0078d4">App Service Plan (P2v3)</text>
+
+  <!-- App Service icon -->
+  <g transform="translate(195,255)">
+    <!-- icon -->
+    <rect x="0" y="0" width="60" height="60" rx="6" ry="6" fill="#0078d4"/>
+    <path d="M15 20 L30 12 L45 20 L45 40 L30 48 L15 40 Z" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="30" cy="30" r="6" fill="#0078d4"/>
+    <text x="30" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#243a5e">App Service</text>
+    <text x="30" y="94" text-anchor="middle" font-size="10" fill="#5a6678">app-payment-prod</text>
+    <text x="30" y="108" text-anchor="middle" font-size="10" fill="#5a6678">(VNet integrated)</text>
+  </g>
+
+  <!-- Private Endpoint NIC in snet-app for KV (optional placement) -->
+  <g transform="translate(150,440)">
+    <rect x="0" y="0" width="220" height="60" rx="6" ry="6" fill="#fff7e6" stroke="#d29922" stroke-width="1"/>
+    <rect x="10" y="14" width="32" height="32" rx="4" fill="#d29922"/>
+    <text x="26" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">PE</text>
+    <text x="120" y="28" font-size="11" font-weight="bold" fill="#5a4214">Private Endpoint</text>
+    <text x="120" y="44" font-size="10" fill="#5a4214">to Key Vault</text>
+  </g>
+
+  <!-- Private Endpoint NIC in snet-app for App Insights ingestion (via AMPLS optional, simplified) -->
+  <g transform="translate(150,520)">
+    <rect x="0" y="0" width="220" height="55" rx="6" ry="6" fill="#fff7e6" stroke="#d29922" stroke-width="1"/>
+    <rect x="10" y="12" width="32" height="32" rx="4" fill="#d29922"/>
+    <text x="26" y="33" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">PE</text>
+    <text x="120" y="26" font-size="11" font-weight="bold" fill="#5a4214">Telemetry egress</text>
+    <text x="120" y="42" font-size="10" fill="#5a4214">to App Insights</text>
+  </g>
+
+  <!-- snet-data subnet -->
+  <rect x="450" y="180" width="380" height="410" rx="8" ry="8" fill="#ffffff" stroke="#5b9bd5" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="465" y="202" font-size="12" font-weight="bold" fill="#1f6feb">Subnet: snet-data  (10.20.2.0/24)</text>
+
+  <!-- Private Endpoint for SQL -->
+  <g transform="translate(475,235)">
+    <rect x="0" y="0" width="330" height="70" rx="6" ry="6" fill="#fff7e6" stroke="#d29922" stroke-width="1.5"/>
+    <rect x="14" y="18" width="36" height="36" rx="4" fill="#d29922"/>
+    <text x="32" y="42" text-anchor="middle" font-size="15" font-weight="bold" fill="#ffffff">PE</text>
+    <text x="70" y="32" font-size="12" font-weight="bold" fill="#5a4214">Private Endpoint</text>
+    <text x="70" y="50" font-size="11" fill="#5a4214">privatelink.database.windows.net</text>
+    <text x="70" y="64" font-size="10" fill="#5a4214">NIC in snet-data</text>
+  </g>
+
+  <!-- Azure SQL DB icon -->
+  <g transform="translate(575,360)">
+    <rect x="0" y="0" width="80" height="80" rx="8" ry="8" fill="#e81123"/>
+    <ellipse cx="40" cy="22" rx="26" ry="8" fill="#ffffff"/>
+    <path d="M14 22 L14 58 Q14 66 40 66 Q66 66 66 58 L66 22" fill="none" stroke="#ffffff" stroke-width="3"/>
+    <ellipse cx="40" cy="40" rx="26" ry="8" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <text x="40" y="100" text-anchor="middle" font-size="12" font-weight="bold" fill="#243a5e">Azure SQL Database</text>
+    <text x="40" y="116" text-anchor="middle" font-size="10" fill="#5a6678">sql-payment-prod</text>
+    <text x="40" y="130" text-anchor="middle" font-size="10" fill="#5a6678">General Purpose</text>
+    <text x="40" y="144" text-anchor="middle" font-size="10" fill="#5a6678">Public access: Disabled</text>
+  </g>
+
+  <!-- PaaS services outside the VNet (right column) -->
+  <text x="880" y="152" font-size="13" font-weight="bold" fill="#0078d4">Azure PaaS Services</text>
+
+  <!-- Key Vault icon -->
+  <g transform="translate(880,180)">
+    <rect x="0" y="0" width="160" height="120" rx="8" ry="8" fill="#ffffff" stroke="#0078d4" stroke-width="1"/>
+    <g transform="translate(50,15)">
+      <rect x="0" y="10" width="60" height="50" rx="4" fill="#0072c6"/>
+      <path d="M15 10 V0 Q15 -6 30 -6 Q45 -6 45 0 V10" fill="none" stroke="#0072c6" stroke-width="4"/>
+      <circle cx="30" cy="32" r="6" fill="#ffd700"/>
+      <rect x="28" y="36" width="4" height="14" fill="#ffd700"/>
+    </g>
+    <text x="80" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="#243a5e">Key Vault</text>
+    <text x="80" y="108" text-anchor="middle" font-size="10" fill="#5a6678">kv-payment-prod (conn strings)</text>
+  </g>
+
+  <!-- App Insights icon -->
+  <g transform="translate(880,320)">
+    <rect x="0" y="0" width="160" height="120" rx="8" ry="8" fill="#ffffff" stroke="#0078d4" stroke-width="1"/>
+    <g transform="translate(55,18)">
+      <circle cx="25" cy="25" r="22" fill="#68217a"/>
+      <path d="M10 35 L20 22 L28 30 L40 14" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="40" cy="14" r="3" fill="#ffd700"/>
+    </g>
+    <text x="80" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="#243a5e">Application Insights</text>
+    <text x="80" y="108" text-anchor="middle" font-size="10" fill="#5a6678">appi-payment-prod</text>
+  </g>
+
+  <!-- Internet / Client -->
+  <g transform="translate(880,460)">
+    <rect x="0" y="0" width="160" height="90" rx="8" ry="8" fill="#ffffff" stroke="#5a6678" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="80" cy="36" r="18" fill="none" stroke="#5a6678" stroke-width="2"/>
+    <ellipse cx="80" cy="36" rx="8" ry="18" fill="none" stroke="#5a6678" stroke-width="1"/>
+    <line x1="62" y1="36" x2="98" y2="36" stroke="#5a6678" stroke-width="1"/>
+    <text x="80" y="74" text-anchor="middle" font-size="11" font-weight="bold" fill="#243a5e">Internet Clients (HTTPS)</text>
+  </g>
+
+  <!-- ARROWS / FLOWS -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#243a5e"/>
+    </marker>
+    <marker id="arrowPrivate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#107c10"/>
+    </marker>
+  </defs>
+
+  <!-- Client to App Service (over public ingress, simplified) -->
+  <line x1="880" y1="505" x2="285" y2="320" stroke="#243a5e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <text x="600" y="430" font-size="10" fill="#243a5e">HTTPS (443)</text>
+
+  <!-- App Service -> PE to SQL (private) -->
+  <line x1="285" y1="335" x2="640" y2="270" stroke="#107c10" stroke-width="2" marker-end="url(#arrowPrivate)"/>
+  <text x="430" y="285" font-size="10" font-weight="bold" fill="#107c10">private link (1433)</text>
+
+  <!-- PE to SQL DB (logical association) -->
+  <line x1="640" y1="305" x2="615" y2="360" stroke="#107c10" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- App Service -> PE to Key Vault -->
+  <line x1="285" y1="360" x2="260" y2="440" stroke="#107c10" stroke-width="2" marker-end="url(#arrowPrivate)"/>
+  <text x="170" y="425" font-size="10" font-weight="bold" fill="#107c10">private link</text>
+
+  <!-- PE-KV to Key Vault service -->
+  <line x1="370" y1="470" x2="880" y2="230" stroke="#107c10" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- App Service -> PE for telemetry -->
+  <line x1="285" y1="370" x2="260" y2="520" stroke="#107c10" stroke-width="2" marker-end="url(#arrowPrivate)"/>
+
+  <!-- PE-AI to AppInsights -->
+  <line x1="370" y1="548" x2="880" y2="370" stroke="#107c10" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- Legend -->
+  <g transform="translate(70,640)">
+    <rect x="0" y="0" width="980" height="30" rx="6" ry="6" fill="#ffffff" stroke="#c8d2dc"/>
+    <line x1="14" y1="15" x2="44" y2="15" stroke="#107c10" stroke-width="2"/>
+    <text x="50" y="19" font-size="11" fill="#243a5e">Private Link / Private Endpoint traffic (no public exposure)</text>
+    <line x1="330" y1="15" x2="360" y2="15" stroke="#243a5e" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <text x="366" y="19" font-size="11" fill="#243a5e">Public HTTPS ingress</text>
+    <rect x="520" y="8" width="14" height="14" fill="#fff7e6" stroke="#d29922"/>
+    <text x="540" y="19" font-size="11" fill="#243a5e">Private Endpoint (NIC in subnet)</text>
+    <text x="760" y="19" font-size="11" font-style="italic" fill="#5a6678">Future: multi-region (paired East US 2)</text>
+  </g>
+</svg>

@@ -1,0 +1,66 @@
+title: "Contoso Payment Service on Azure"
+subtitle: "App Service + Azure SQL with private endpoints (West US 2, multi-region planned)"
+
+containers:
+  - name: "Production subscription"
+    kind: subscription
+    containers:
+      - name: "rg-payment-prod (West US 2)"
+        kind: resource-group
+        resources:
+          - id: ai
+            type: application-insights
+            label: "contoso-pay-ai"
+            meta: ["telemetry"]
+          - id: kv
+            type: key-vault
+            label: "contoso-pay-kv"
+            meta: ["connection strings"]
+        containers:
+          - name: "vnet-payment · 10.20.0.0/16"
+            kind: vnet
+            containers:
+              - name: "snet-app · 10.20.1.0/24"
+                kind: subnet
+                resources:
+                  - id: app
+                    type: app-service
+                    label: "contoso-payment"
+                    meta: ["P2v3", "West US 2"]
+              - name: "snet-data · 10.20.2.0/24"
+                kind: subnet
+                resources:
+                  - id: pe_sql
+                    type: private-endpoints
+                    label: "pe-sql"
+                  - id: pe_kv
+                    type: private-endpoints
+                    label: "pe-kv"
+                  - id: sql
+                    type: sql-database
+                    label: "contoso-pay-sql"
+                    meta: ["General Purpose"]
+
+edges:
+  - from: app
+    to: pe_sql
+    label: "private endpoint"
+  - from: pe_sql
+    to: sql
+    style: dashed
+  - from: app
+    to: pe_kv
+    label: "private endpoint"
+  - from: pe_kv
+    to: kv
+    style: dashed
+  - from: app
+    to: ai
+    label: "telemetry"
+    style: dotted
+
+metadata:
+  Owner: "payments-platform"
+  Environment: "production"
+  Region: "West US 2 (multi-region planned)"
+  Reviewed: "2026-05-30"
