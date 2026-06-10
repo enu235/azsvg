@@ -1,0 +1,26 @@
+{
+  "skill_name": "azure-svg-diagram",
+  "evals": [
+    {
+      "id": 0,
+      "name": "security-review-findings",
+      "prompt": "I just finished a troubleshooting session with a customer. Their setup: an App Service called contoso-api in a vnet subnet, fronted by an Application Gateway, talking to a SQL database and a storage account. Problems I found: the storage account allows public blob access, the SQL server firewall is wide open (0.0.0.0-255.255.255.255), and the App Service still accepts TLS 1.0. Draw their architecture as an SVG and visually flag these three issues on the diagram so I can walk the customer through what to fix.",
+      "expected_output": "An SVG using real Azure icons where the storage account, SQL database, and App Service are visually highlighted (severity colors/badges) with a legend explaining each issue and the fix.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "project-dataflow-properties",
+      "prompt": "Create an Azure architecture diagram for our new order processing platform: Front Door routes to an App Service (order-api, P1v3), which drops messages on a Service Bus queue; a Function App on the consumption plan processes the queue and writes to Cosmos DB (serverless). Show the SKUs on each service and number the request flow steps 1 through 4. Output an SVG.",
+      "expected_output": "An SVG with real Azure icons, SKU properties visible under each service, and numbered dataflow steps 1-4 with a legend.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "casual-aks-troubleshoot",
+      "prompt": "customer's AKS cluster cant pull images from their ACR. turns out the ACR has public network access disabled but theres no private endpoint in the cluster vnet, and the kubelet identity is missing the AcrPull role. can you whip up a quick svg diagram of their setup that points out whats broken? i want to attach it to an email to the customer",
+      "expected_output": "An SVG showing AKS, ACR, vnet topology with the missing private endpoint and missing AcrPull role flagged as findings with recommendations.",
+      "files": []
+    }
+  ]
+}

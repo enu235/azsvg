@@ -1,0 +1,59 @@
+title: "Baseline App Service architecture"
+subtitle: "Private endpoints + zone redundancy"
+
+containers:
+  - name: "Production subscription"
+    kind: subscription
+    containers:
+      - name: "rg-web-prod (West US 2)"
+        kind: resource-group
+        resources:
+          - id: ai
+            type: application-insights
+            label: "contoso-ai"
+        containers:
+          - name: "vnet-web · 10.0.0.0/16"
+            kind: vnet
+            containers:
+              - name: "snet-gateway · 10.0.1.0/24"
+                kind: subnet
+                resources:
+                  - id: agw
+                    type: application-gateway
+                    label: "contoso-agw"
+                    meta: ["WAF v2"]
+              - name: "snet-app · 10.0.2.0/24"
+                kind: subnet
+                resources:
+                  - id: web
+                    type: app-service
+                    label: "contoso-web"
+                    meta: ["P2v3", "zone-redundant"]
+              - name: "snet-data · 10.0.3.0/24"
+                kind: subnet
+                resources:
+                  - id: sql
+                    type: sql-database
+                    label: "contoso-sql"
+                    meta: ["Hyperscale"]
+                  - id: kv
+                    type: key-vault
+                    label: "contoso-kv"
+
+edges:
+  - from: agw
+    to: web
+    label: "private endpoint"
+  - from: web
+    to: sql
+    label: "private endpoint"
+  - from: web
+    to: kv
+    label: "managed identity"
+  - from: web
+    to: ai
+    label: "telemetry"
+
+metadata:
+  Owner: "platform-eng"
+  Region: "West US 2"

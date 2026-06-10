@@ -1,0 +1,12 @@
+{
+  "eval_id": 0,
+  "eval_name": "eval-0-security-review",
+  "prompt": "I just finished a troubleshooting session with a customer. Their setup: an App Service called contoso-api in a vnet subnet, fronted by an Application Gateway, talking to a SQL database and a storage account. Problems I found: the storage account allows public blob access, the SQL server firewall is wide open (0.0.0.0-255.255.255.255), and the App Service still accepts TLS 1.0. Draw their architecture as an SVG and visually flag these three issues on the diagram so I can walk the customer through what to fix.",
+  "assertions": [
+    "diagram.svg exists and parses as valid XML with an <svg> root element",
+    "The SVG embeds real Azure service icons (contains <symbol> definitions with <use> references, not placeholder rects) for App Service, Application Gateway, SQL, and Storage",
+    "All three problem services (App Service, SQL database, storage account) carry a visual severity highlight: red (#d13438) or orange (#ca5010) ring/badge elements positioned at those resources",
+    "A findings legend is rendered in the SVG (text 'Findings') listing all three issues with severity wording and an actionable fix/recommendation line for each",
+    "Findings are numbered, and each number appears both on the topology (badge) and in the legend"
+  ]
+}

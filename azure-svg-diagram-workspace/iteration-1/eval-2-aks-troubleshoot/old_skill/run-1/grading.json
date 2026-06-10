@@ -1,0 +1,39 @@
+{
+  "eval_id": 2,
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+      "passed": true,
+      "evidence": "exists=True, valid_xml=True, svg_root=True, size=13951"
+    },
+    {
+      "text": "The SVG embeds real Azure service icons for AKS (kubernetes-services) and ACR (container-registries)",
+      "passed": false,
+      "evidence": "symbols=3, uses=3, placeholders=1, aks/acr text present"
+    },
+    {
+      "text": "Both root causes are flagged visually with severity styling: the missing private endpoint / blocked network path, and the missing AcrPull role assignment",
+      "passed": false,
+      "evidence": "severity color occurrences: {'#d13438': 0, '#ca5010': 0}"
+    },
+    {
+      "text": "A findings legend explains both issues and gives a fix/recommendation for each (mentions private endpoint and AcrPull)",
+      "passed": false,
+      "evidence": "findings_panel=False, fix_lines=True, private-endpoint=True, acrpull=True"
+    },
+    {
+      "text": "The diagram is self-contained and email-ready: single SVG file, white background, title present",
+      "passed": true,
+      "evidence": "single self-contained SVG file with title text"
+    }
+  ],
+  "pass_count": 2,
+  "total": 5,
+  "summary": {
+    "pass_rate": 0.4,
+    "passed": 2,
+    "failed": 3,
+    "total": 5
+  }
+}

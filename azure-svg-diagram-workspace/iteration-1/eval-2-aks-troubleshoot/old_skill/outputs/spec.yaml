@@ -1,0 +1,57 @@
+title: "AKS cannot pull images from ACR"
+subtitle: "Two blockers: no private endpoint in the cluster vnet, kubelet identity missing AcrPull"
+
+containers:
+  - name: "Customer subscription"
+    kind: subscription
+    containers:
+      - name: "rg-aks-prod"
+        kind: resource-group
+        layout: row
+        containers:
+          - name: "vnet-aks · 10.0.0.0/16"
+            kind: vnet
+            containers:
+              - name: "snet-aks-nodes · 10.0.1.0/24"
+                kind: subnet
+                resources:
+                  - id: aks
+                    type: kubernetes-services
+                    label: "aks-prod-cluster"
+                    meta: ["image pulls FAILING (401/timeout)"]
+                  - id: kubelet
+                    type: managed-identity
+                    label: "kubelet identity"
+                    meta: ["MISSING: AcrPull role on ACR"]
+              - name: "snet-endpoints · 10.0.2.0/24"
+                kind: subnet
+                resources:
+                  - id: pe
+                    type: private-endpoints
+                    label: "ACR private endpoint"
+                    meta: ["MISSING — not deployed"]
+        resources:
+          - id: acr
+            type: container-registries
+            label: "customer ACR"
+            meta: ["Premium", "public network access: DISABLED"]
+
+edges:
+  - from: aks
+    to: acr
+    label: "image pull — BLOCKED (no network path)"
+    style: dashed
+  - from: kubelet
+    to: acr
+    label: "AcrPull — NOT ASSIGNED"
+    style: dotted
+  - from: pe
+    to: acr
+    label: "private link (needed)"
+    style: dashed
+
+metadata:
+  Issue: "AKS image pulls from ACR failing"
+  Root cause 1: "ACR public access disabled, no private endpoint in vnet-aks"
+  Root cause 2: "Kubelet identity lacks AcrPull role assignment"
+  Fix: "Add ACR private endpoint + DNS zone; grant AcrPull to kubelet identity"

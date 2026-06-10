@@ -1,0 +1,131 @@
+title: "AKS image pull failure — root-cause review"
+subtitle: "Cluster cannot pull from Azure Container Registry"
+description: >-
+  Current-state topology of the customer's AKS-to-ACR path as deployed today.
+  Pods are stuck in ImagePullBackOff. Two independent blockers were found:
+  the registry has public network access disabled with no private endpoint
+  in the cluster vnet (no network path), and the kubelet identity has no
+  AcrPull role assignment on the registry (no authorization). Both must be
+  fixed before pulls succeed.
+
+containers:
+  - name: "rg-aks-prod"
+    kind: resource-group
+    id: rg-aks-prod
+    containers:
+      - name: "vnet-aks · 10.10.0.0/16"
+        kind: vnet
+        id: vnet-aks
+        description: >-
+          Cluster virtual network. Contains only the node subnet — there is no
+          private endpoint subnet and no privatelink.azurecr.io private DNS
+          zone linked to this vnet.
+        containers:
+          - name: "snet-aks-nodes · 10.10.1.0/24"
+            kind: subnet
+            id: snet-aks-nodes
+            resources:
+              - id: aks
+                type: kubernetes-services
+                label: "aks-prod-cluster"
+                properties:
+                  Pod status: "ImagePullBackOff"
+                  ACR integration: "not attached"
+                description: >-
+                  Production AKS cluster. Workload pods reference images in
+                  acrcustomerprod.azurecr.io; every pull fails. After both
+                  findings are remediated, validate end-to-end with
+                  'az aks check-acr --acr acrcustomerprod.azurecr.io'.
+    resources:
+      - id: kubelet-mi
+        type: managed-identities
+        label: "kubelet identity"
+        meta: ["user-assigned (node RG)"]
+        properties:
+          AcrPull on ACR: "not assigned"
+        description: >-
+          The kubelet's user-assigned managed identity, used to request pull
+          tokens from ACR. It currently has no role assignments scoped to the
+          registry, so even with a working network path pulls would fail
+          authorization with 401 Unauthorized.
+
+  - name: "rg-shared-services"
+    kind: resource-group
+    id: rg-shared
+    resources:
+      - id: acr
+        type: container-registries
+        label: "acrcustomerprod"
+        properties:
+          Public network access: "Disabled"
+          Private endpoints: "none"
+        description: >-
+          Container registry holding the workload images. Public network
+          access is disabled (good intent), but no private endpoint was ever
+          created, so the registry is unreachable from everywhere — including
+          the cluster vnet. Note that Private Link requires the Premium SKU.
+
+edges:
+  - from: aks
+    to: kubelet-mi
+    id: edge-identity
+    label: "pull auth via kubelet identity"
+    style: dashed
+    description: "Kubelet uses this identity to exchange an Entra token for an ACR pull token."
+  - from: aks
+    to: acr
+    id: edge-pull
+    label: "image pull — failing"
+    description: "Image pull from the registry; currently blocked at the network layer."
+
+findings:
+  - ref: edge-pull
+    severity: critical
+    title: "No network path from AKS to ACR"
+    detail: >-
+      Public network access on acrcustomerprod is Disabled but no private
+      endpoint exists in vnet-aks (and no privatelink.azurecr.io DNS zone is
+      linked), so the registry is unreachable from the nodes. This is the
+      direct cause of the ImagePullBackOff outage.
+    recommendation: >-
+      Create a private endpoint for the registry in vnet-aks (az network
+      private-endpoint create --private-connection-resource-id <acr-id>
+      --group-id registry) and link the privatelink.azurecr.io private DNS
+      zone to the vnet via a DNS zone group.
+  - ref: kubelet-mi
+    severity: critical
+    title: "Kubelet identity missing AcrPull role"
+    detail: >-
+      The kubelet's managed identity has no AcrPull role assignment on the
+      registry. Once the network path is restored, pulls will still fail with
+      401 Unauthorized until this is granted.
+    recommendation: >-
+      Run 'az aks update -g rg-aks-prod -n aks-prod-cluster --attach-acr
+      acrcustomerprod' (or 'az role assignment create --assignee
+      <kubelet-identity-client-id> --role AcrPull --scope <acr-resource-id>').
+  - ref: acr
+    severity: info
+    title: "Private Link requires ACR Premium SKU"
+    detail: >-
+      Private endpoints are only supported on the Premium tier. Verify the
+      registry SKU before creating the endpoint; Basic/Standard registries
+      must be upgraded first.
+    recommendation: >-
+      Check with 'az acr show -n acrcustomerprod --query sku.name' and, if
+      needed, 'az acr update -n acrcustomerprod --sku Premium'.
+  - ref: aks
+    severity: info
+    title: "Validate the fix with az aks check-acr"
+    detail: >-
+      After both blockers are remediated, the built-in connectivity check
+      confirms DNS resolution, network reachability, and pull authorization
+      in one command.
+    recommendation: >-
+      Run 'az aks check-acr -g rg-aks-prod -n aks-prod-cluster --acr
+      acrcustomerprod.azurecr.io', then restart the failing deployments.
+
+metadata:
+  Customer: "(customer name)"
+  Engineer: "Allan Miller"
+  Session: "2026-06-09"
+  Issue: "AKS pods in ImagePullBackOff pulling from ACR"

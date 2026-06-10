@@ -1,0 +1,323 @@
+{
+  "metadata": {
+    "skill_name": "azure-svg-diagram",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-06-10T02:21:47Z",
+    "evals_run": [
+      0,
+      1,
+      2
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 440.8,
+        "tokens": 77845,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+          "passed": true,
+          "evidence": "exists=True, valid_xml=True, svg_root=True, size=15693"
+        },
+        {
+          "text": "The SVG embeds real Azure service icons (contains <symbol> definitions with <use> references, not placeholder rects) for App Service, Application Gateway, SQL, and Storage",
+          "passed": true,
+          "evidence": "symbols=4, uses=4, placeholders=0"
+        },
+        {
+          "text": "All three problem services (App Service, SQL database, storage account) carry a visual severity highlight: red (#d13438) or orange (#ca5010) ring/badge elements positioned at those resources",
+          "passed": false,
+          "evidence": "severity color occurrences: {'#d13438': 0, '#ca5010': 0} (rings+badges+legend expected; >=6 indicates per-resource highlights)"
+        },
+        {
+          "text": "A findings legend is rendered in the SVG (text 'Findings') listing all three issues with severity wording and an actionable fix/recommendation line for each",
+          "passed": false,
+          "evidence": "findings_panel=False, fix_lines=False, mentions tls/firewall/public-blob in text"
+        },
+        {
+          "text": "Findings are numbered, and each number appears both on the topology (badge) and in the legend",
+          "passed": false,
+          "evidence": "white badge numbers found: [] (need 1-3; badges appear once on topology and once in legend)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 332.1,
+        "tokens": 48900,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+          "passed": true,
+          "evidence": "exists=True, valid_xml=True, svg_root=True, size=15024"
+        },
+        {
+          "text": "The SVG embeds real Azure service icons for Front Door, App Service, Service Bus, Function App, and Cosmos DB (no placeholder rects)",
+          "passed": true,
+          "evidence": "symbols=5, uses=5, placeholders=0"
+        },
+        {
+          "text": "SKU/tier text is visible in the SVG: 'P1v3', a consumption-plan indicator, and a serverless indicator",
+          "passed": true,
+          "evidence": "p1v3=True, consumption=True, serverless=True"
+        },
+        {
+          "text": "Numbered step markers 1-4 are rendered along the request path (numbered circles on edges)",
+          "passed": false,
+          "evidence": "white badge numbers found: [] (need 1-4)"
+        },
+        {
+          "text": "A dataflow legend (text 'Dataflow') lists the numbered steps in order",
+          "passed": false,
+          "evidence": "dataflow_panel=False"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 108.1,
+        "tokens": 25018,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+          "passed": true,
+          "evidence": "exists=True, valid_xml=True, svg_root=True, size=13951"
+        },
+        {
+          "text": "The SVG embeds real Azure service icons for AKS (kubernetes-services) and ACR (container-registries)",
+          "passed": false,
+          "evidence": "symbols=3, uses=3, placeholders=1, aks/acr text present"
+        },
+        {
+          "text": "Both root causes are flagged visually with severity styling: the missing private endpoint / blocked network path, and the missing AcrPull role assignment",
+          "passed": false,
+          "evidence": "severity color occurrences: {'#d13438': 0, '#ca5010': 0}"
+        },
+        {
+          "text": "A findings legend explains both issues and gives a fix/recommendation for each (mentions private endpoint and AcrPull)",
+          "passed": false,
+          "evidence": "findings_panel=False, fix_lines=True, private-endpoint=True, acrpull=True"
+        },
+        {
+          "text": "The diagram is self-contained and email-ready: single SVG file, white background, title present",
+          "passed": true,
+          "evidence": "single self-contained SVG file with title text"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 149.0,
+        "tokens": 38396,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+          "passed": true,
+          "evidence": "exists=True, valid_xml=True, svg_root=True, size=22977"
+        },
+        {
+          "text": "The SVG embeds real Azure service icons (contains <symbol> definitions with <use> references, not placeholder rects) for App Service, Application Gateway, SQL, and Storage",
+          "passed": true,
+          "evidence": "symbols=4, uses=4, placeholders=0"
+        },
+        {
+          "text": "All three problem services (App Service, SQL database, storage account) carry a visual severity highlight: red (#d13438) or orange (#ca5010) ring/badge elements positioned at those resources",
+          "passed": true,
+          "evidence": "severity color occurrences: {'#d13438': 13, '#ca5010': 1} (rings+badges+legend expected; >=6 indicates per-resource highlights)"
+        },
+        {
+          "text": "A findings legend is rendered in the SVG (text 'Findings') listing all three issues with severity wording and an actionable fix/recommendation line for each",
+          "passed": true,
+          "evidence": "findings_panel=True, fix_lines=True, mentions tls/firewall/public-blob in text"
+        },
+        {
+          "text": "Findings are numbered, and each number appears both on the topology (badge) and in the legend",
+          "passed": true,
+          "evidence": "white badge numbers found: [1, 2, 3] (need 1-3; badges appear once on topology and once in legend)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 98.8,
+        "tokens": 32166,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+          "passed": true,
+          "evidence": "exists=True, valid_xml=True, svg_root=True, size=19608"
+        },
+        {
+          "text": "The SVG embeds real Azure service icons for Front Door, App Service, Service Bus, Function App, and Cosmos DB (no placeholder rects)",
+          "passed": true,
+          "evidence": "symbols=5, uses=5, placeholders=0"
+        },
+        {
+          "text": "SKU/tier text is visible in the SVG: 'P1v3', a consumption-plan indicator, and a serverless indicator",
+          "passed": true,
+          "evidence": "p1v3=True, consumption=True, serverless=True"
+        },
+        {
+          "text": "Numbered step markers 1-4 are rendered along the request path (numbered circles on edges)",
+          "passed": true,
+          "evidence": "white badge numbers found: [1, 2, 3, 4] (need 1-4)"
+        },
+        {
+          "text": "A dataflow legend (text 'Dataflow') lists the numbered steps in order",
+          "passed": true,
+          "evidence": "dataflow_panel=True"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 99.3,
+        "tokens": 30350,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+          "passed": true,
+          "evidence": "exists=True, valid_xml=True, svg_root=True, size=22282"
+        },
+        {
+          "text": "The SVG embeds real Azure service icons for AKS (kubernetes-services) and ACR (container-registries)",
+          "passed": true,
+          "evidence": "symbols=3, uses=3, placeholders=0, aks/acr text present"
+        },
+        {
+          "text": "Both root causes are flagged visually with severity styling: the missing private endpoint / blocked network path, and the missing AcrPull role assignment",
+          "passed": true,
+          "evidence": "severity color occurrences: {'#d13438': 11, '#ca5010': 1}"
+        },
+        {
+          "text": "A findings legend explains both issues and gives a fix/recommendation for each (mentions private endpoint and AcrPull)",
+          "passed": true,
+          "evidence": "findings_panel=True, fix_lines=True, private-endpoint=True, acrpull=True"
+        },
+        {
+          "text": "The diagram is self-contained and email-ready: single SVG file, white background, title present",
+          "passed": true,
+          "evidence": "single self-contained SVG file with title text"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "old_skill": {
+      "pass_rate": {
+        "mean": 0.4667,
+        "stddev": 0.1155,
+        "min": 0.4,
+        "max": 0.6
+      },
+      "time_seconds": {
+        "mean": 293.6667,
+        "stddev": 169.6472,
+        "min": 108.1,
+        "max": 440.8
+      },
+      "tokens": {
+        "mean": 50587.6667,
+        "stddev": 26453.9061,
+        "min": 25018,
+        "max": 77845
+      }
+    },
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 115.7,
+        "stddev": 28.8397,
+        "min": 98.8,
+        "max": 149.0
+      },
+      "tokens": {
+        "mean": 33637.3333,
+        "stddev": 4219.9698,
+        "min": 30350,
+        "max": 38396
+      }
+    },
+    "delta": {
+      "pass_rate": "-0.53",
+      "time_seconds": "+178.0",
+      "tokens": "+16950"
+    }
+  },
+  "notes": []
+}

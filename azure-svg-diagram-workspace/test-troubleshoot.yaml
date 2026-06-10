@@ -1,0 +1,113 @@
+title: "Contoso web workload — security review"
+subtitle: "Findings from the 2026-06-09 troubleshooting session"
+description: >
+  Customer reported intermittent 502s and a failed security audit. The review below
+  highlights three configuration issues found in the production environment and one
+  informational note about the diagnostic pipeline.
+
+containers:
+  - name: "Production subscription"
+    kind: subscription
+    containers:
+      - name: "rg-web-prod"
+        kind: resource-group
+        meta: ["West US 2"]
+        resources:
+          - id: ai
+            type: application-insights
+            label: "contoso-ai"
+            description: "Telemetry sink for the web tier."
+        containers:
+          - name: "vnet-web · 10.0.0.0/16"
+            kind: vnet
+            containers:
+              - name: "snet-gateway · 10.0.1.0/24"
+                kind: subnet
+                resources:
+                  - id: agw
+                    type: application-gateway
+                    label: "contoso-agw"
+                    description: "Public entry point for all customer traffic."
+                    properties:
+                      SKU: "WAF v2"
+                      Mode: "Detection"
+                      Backend: "contoso-web"
+              - name: "snet-app · 10.0.2.0/24"
+                kind: subnet
+                id: snet-app
+                resources:
+                  - id: web
+                    type: app-service
+                    label: "contoso-web"
+                    description: "Customer-facing API, .NET 8."
+                    properties:
+                      SKU: "P2v3"
+                      TLS: "1.0"
+                      Public access: "Enabled"
+              - name: "snet-data · 10.0.3.0/24"
+                kind: subnet
+                resources:
+                  - id: sql
+                    type: sql-database
+                    label: "contoso-sql"
+                    properties:
+                      Tier: "Hyperscale"
+                      Firewall: "0.0.0.0 allowed"
+                  - id: kv
+                    type: key-vault
+                    label: "contoso-kv"
+                    meta: ["soft-delete on"]
+
+edges:
+  - from: agw
+    to: web
+    step: 1
+    label: "HTTP"
+    id: agw-web
+    description: "Application Gateway forwards customer traffic to the App Service backend pool."
+  - from: web
+    to: sql
+    step: 2
+    label: "SQL auth"
+    id: web-sql
+    description: "API reads and writes order data using SQL authentication."
+  - from: web
+    to: kv
+    step: 3
+    label: "managed identity"
+    description: "Secrets and connection strings fetched at startup."
+  - from: web
+    to: ai
+    label: "telemetry"
+    style: dotted
+
+findings:
+  - ref: web
+    severity: critical
+    title: "TLS 1.0 still accepted"
+    detail: "The App Service minimum TLS version is 1.0, which fails the customer's compliance baseline and modern client handshakes."
+    recommendation: "Set minimum TLS version to 1.2 under Configuration > General settings."
+  - ref: sql
+    severity: critical
+    title: "SQL firewall allows 0.0.0.0"
+    detail: "The 'Allow Azure services' rule plus a 0.0.0.0 start-IP rule effectively expose the server to any Azure tenant."
+    recommendation: "Remove the open rule and use a private endpoint in snet-data."
+  - ref: agw-web
+    severity: warning
+    title: "Gateway to backend is plain HTTP"
+    detail: "Traffic between Application Gateway and App Service is unencrypted inside the vnet."
+    recommendation: "Switch the backend setting to HTTPS and pin the App Service certificate."
+  - ref: snet-app
+    severity: warning
+    title: "No NSG on the app subnet"
+    detail: "snet-app has no network security group, so lateral traffic in the vnet is unrestricted."
+    recommendation: "Attach an NSG allowing only AppGw subnet ingress on 443."
+  - ref: ai
+    severity: info
+    title: "Sampling at 100%"
+    detail: "Full telemetry sampling is driving ingestion cost; consider adaptive sampling."
+
+metadata:
+  Customer: "Contoso"
+  Engineer: "Allan Miller"
+  Session: "2026-06-09"

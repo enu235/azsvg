@@ -1,0 +1,48 @@
+title: "Order processing platform"
+subtitle: "Front Door -> order-api -> Service Bus -> Functions -> Cosmos DB"
+
+containers:
+  - name: "Internet"
+    kind: internet
+    resources:
+      - id: afd
+        type: front-door
+        label: "order-frontdoor"
+        meta: ["Standard"]
+  - name: "rg-orders-prod"
+    kind: resource-group
+    resources:
+      - id: api
+        type: app-service
+        label: "order-api"
+        meta: ["P1v3"]
+      - id: sb
+        type: service-bus
+        label: "orders queue"
+        meta: ["Standard", "queue: orders"]
+      - id: fn
+        type: function-app
+        label: "order-processor"
+        meta: ["Consumption"]
+      - id: cos
+        type: cosmos-db
+        label: "orders-db"
+        meta: ["Serverless"]
+
+edges:
+  - from: afd
+    to: api
+    label: "1. HTTPS"
+  - from: api
+    to: sb
+    label: "2. enqueue order"
+  - from: sb
+    to: fn
+    label: "3. queue trigger"
+  - from: fn
+    to: cos
+    label: "4. write order"
+
+metadata:
+  Workload: "order processing"
+  Flow: "steps 1-4"

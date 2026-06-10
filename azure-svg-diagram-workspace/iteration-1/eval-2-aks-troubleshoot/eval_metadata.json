@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-2-aks-troubleshoot",
+  "prompt": "customer's AKS cluster cant pull images from their ACR. turns out the ACR has public network access disabled but theres no private endpoint in the cluster vnet, and the kubelet identity is missing the AcrPull role. can you whip up a quick svg diagram of their setup that points out whats broken? i want to attach it to an email to the customer",
+  "assertions": [
+    "diagram.svg exists and parses as valid XML with an <svg> root element",
+    "The SVG embeds real Azure service icons for AKS (kubernetes-services) and ACR (container-registries)",
+    "Both root causes are flagged visually with severity styling: the missing private endpoint / blocked network path, and the missing AcrPull role assignment",
+    "A findings legend explains both issues and gives a fix/recommendation for each (mentions private endpoint and AcrPull)",
+    "The diagram is self-contained and email-ready: single SVG file, white background, title present"
+  ]
+}

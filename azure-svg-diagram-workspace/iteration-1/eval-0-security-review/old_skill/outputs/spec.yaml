@@ -1,0 +1,55 @@
+title: "Contoso API - current architecture"
+subtitle: "Security review: 3 findings flagged with [!] markers"
+
+containers:
+  - name: "Customer subscription"
+    kind: subscription
+    containers:
+      - name: "rg-contoso"
+        kind: resource-group
+        containers:
+          - name: "vnet-contoso"
+            kind: vnet
+            containers:
+              - name: "snet-agw"
+                kind: subnet
+                resources:
+                  - id: agw
+                    type: application-gateway
+                    label: "contoso-agw"
+                    meta: ["public entry point (internet)"]
+              - name: "snet-app"
+                kind: subnet
+                resources:
+                  - id: api
+                    type: app-service
+                    label: "contoso-api"
+                    meta: ["[!] FINDING 3: accepts TLS 1.0", "fix: set minimum TLS to 1.2"]
+        resources:
+          - id: sql
+            type: sql-database
+            label: "contoso-sql"
+            meta: ["[!] FINDING 2: firewall wide open", "0.0.0.0-255.255.255.255", "fix: restrict to vnet / app egress"]
+          - id: stor
+            type: storage-accounts
+            label: "contoso-storage"
+            meta: ["[!] FINDING 1: public blob access ON", "fix: disable public blob access"]
+
+edges:
+  - from: agw
+    to: api
+    label: "[!] TLS 1.0 allowed"
+  - from: api
+    to: sql
+    label: "SQL"
+  - from: api
+    to: stor
+    label: "blob"
+
+metadata:
+  Customer: "Contoso"
+  Session: "Troubleshooting / security review"
+  Finding 1: "Storage account allows public blob access"
+  Finding 2: "SQL server firewall open to 0.0.0.0-255.255.255.255"
+  Finding 3: "App Service minimum TLS version is 1.0"
+  Date: "2026-06-09"

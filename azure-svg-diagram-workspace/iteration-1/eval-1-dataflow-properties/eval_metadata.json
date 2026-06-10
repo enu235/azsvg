@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-1-dataflow-properties",
+  "prompt": "Create an Azure architecture diagram for our new order processing platform: Front Door routes to an App Service (order-api, P1v3), which drops messages on a Service Bus queue; a Function App on the consumption plan processes the queue and writes to Cosmos DB (serverless). Show the SKUs on each service and number the request flow steps 1 through 4. Output an SVG.",
+  "assertions": [
+    "diagram.svg exists and parses as valid XML with an <svg> root element",
+    "The SVG embeds real Azure service icons for Front Door, App Service, Service Bus, Function App, and Cosmos DB (no placeholder rects)",
+    "SKU/tier text is visible in the SVG: 'P1v3', a consumption-plan indicator, and a serverless indicator",
+    "Numbered step markers 1-4 are rendered along the request path (numbered circles on edges)",
+    "A dataflow legend (text 'Dataflow') lists the numbered steps in order"
+  ]
+}

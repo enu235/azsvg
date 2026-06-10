@@ -1,0 +1,69 @@
+title: "Order processing platform"
+subtitle: "Front Door → App Service → Service Bus → Function App → Cosmos DB"
+description: >
+  Customer orders enter through Azure Front Door and are accepted by the
+  order-api App Service, which enqueues them on a Service Bus queue. A
+  consumption-plan Function App processes the queue asynchronously and
+  persists order documents to a serverless Cosmos DB account.
+
+containers:
+  - name: "rg-orders-prod"
+    kind: resource-group
+    resources:
+      - id: afd
+        type: front-door
+        label: "orders-afd"
+        properties:
+          SKU: "Standard"
+        description: "Global entry point. Routes client traffic to the order-api backend."
+      - id: api
+        type: app-service
+        label: "order-api"
+        properties:
+          SKU: "P1v3"
+        description: "Order intake API. Validates requests and enqueues order messages."
+      - id: sb
+        type: service-bus
+        label: "orders-sbns"
+        meta: ["queue: orders"]
+        properties:
+          SKU: "Standard"
+        description: "Service Bus namespace with the 'orders' queue decoupling intake from processing."
+      - id: fn
+        type: function-app
+        label: "order-processor"
+        properties:
+          Plan: "Consumption"
+        description: "Queue-triggered Function App that processes order messages."
+      - id: cosmos
+        type: cosmos-db
+        label: "orders-cosmos"
+        properties:
+          Mode: "Serverless"
+        description: "Serverless Cosmos DB account storing processed order documents."
+
+edges:
+  - from: afd
+    to: api
+    step: 1
+    label: "HTTPS"
+    description: "Front Door routes client order requests to the order-api App Service."
+  - from: api
+    to: sb
+    step: 2
+    label: "enqueue"
+    description: "order-api drops order messages onto the Service Bus 'orders' queue."
+  - from: sb
+    to: fn
+    step: 3
+    label: "queue trigger"
+    description: "The Function App is triggered by messages arriving on the queue."
+  - from: fn
+    to: cosmos
+    step: 4
+    label: "write"
+    description: "The Function App writes processed orders to Cosmos DB."
+
+metadata:
+  Workload: "Order processing platform"
+  Environment: "production"

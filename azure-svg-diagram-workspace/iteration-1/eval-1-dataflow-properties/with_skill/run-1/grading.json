@@ -1,0 +1,39 @@
+{
+  "eval_id": 1,
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+      "passed": true,
+      "evidence": "exists=True, valid_xml=True, svg_root=True, size=19608"
+    },
+    {
+      "text": "The SVG embeds real Azure service icons for Front Door, App Service, Service Bus, Function App, and Cosmos DB (no placeholder rects)",
+      "passed": true,
+      "evidence": "symbols=5, uses=5, placeholders=0"
+    },
+    {
+      "text": "SKU/tier text is visible in the SVG: 'P1v3', a consumption-plan indicator, and a serverless indicator",
+      "passed": true,
+      "evidence": "p1v3=True, consumption=True, serverless=True"
+    },
+    {
+      "text": "Numbered step markers 1-4 are rendered along the request path (numbered circles on edges)",
+      "passed": true,
+      "evidence": "white badge numbers found: [1, 2, 3, 4] (need 1-4)"
+    },
+    {
+      "text": "A dataflow legend (text 'Dataflow') lists the numbered steps in order",
+      "passed": true,
+      "evidence": "dataflow_panel=True"
+    }
+  ],
+  "pass_count": 5,
+  "total": 5,
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 5,
+    "failed": 0,
+    "total": 5
+  }
+}

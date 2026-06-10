@@ -1,0 +1,107 @@
+title: "Contoso API workload — security review"
+subtitle: "Findings from the 2026-06-09 troubleshooting session"
+description: >
+  Architecture as deployed today: Application Gateway fronting the contoso-api
+  App Service (vnet-integrated), with Azure SQL and a storage account as data
+  stores. Three configuration issues were found during the session and are
+  flagged below — two data-exposure problems and a weak TLS floor on the API.
+
+containers:
+  - name: "rg-contoso-prod"
+    kind: resource-group
+    containers:
+      - name: "vnet-contoso · 10.0.0.0/16"
+        kind: vnet
+        containers:
+          - name: "snet-agw · 10.0.1.0/24"
+            kind: subnet
+            resources:
+              - id: agw
+                type: application-gateway
+                label: "contoso-agw"
+                properties:
+                  SKU: "WAF v2"
+                description: "Public entry point; terminates TLS and forwards to the App Service backend pool."
+          - name: "snet-app · 10.0.2.0/24"
+            kind: subnet
+            resources:
+              - id: api
+                type: app-service
+                label: "contoso-api"
+                properties:
+                  Min TLS: "1.0"
+                  VNet integration: "snet-app"
+                description: "Customer-facing API. Currently accepts TLS 1.0 handshakes — minimum TLS version has never been raised from the legacy default."
+    resources:
+      - id: sql
+        type: sql-database
+        label: "contoso-sql"
+        properties:
+          Firewall: "0.0.0.0-255.255.255.255"
+        description: "Primary application database. The server-level firewall contains a rule spanning the entire IPv4 range, so any internet host can attempt to connect."
+      - id: storage
+        type: storage-accounts
+        label: "contosostorage"
+        properties:
+          Public blob access: "Enabled"
+        description: "Blob storage for application content. Allow Blob Public Access is enabled at the account level, so any container can be flipped to anonymous read."
+
+edges:
+  - from: agw
+    to: api
+    id: agw-api
+    step: 1
+    label: "HTTPS"
+    description: "Application Gateway terminates client TLS and forwards requests to contoso-api."
+  - from: api
+    to: sql
+    id: api-sql
+    step: 2
+    label: "SQL · 1433"
+    description: "API reads/writes application data in contoso-sql."
+  - from: api
+    to: storage
+    id: api-storage
+    step: 3
+    label: "blob"
+    description: "API stores and serves blob content from contosostorage."
+
+findings:
+  - ref: sql
+    severity: critical
+    title: "SQL firewall open to the entire internet"
+    detail: >
+      A server firewall rule spans 0.0.0.0-255.255.255.255, so every IPv4
+      address on the internet can reach the SQL endpoint and attempt logins.
+      Only the App Service should be able to connect.
+    recommendation: >
+      Delete the 0.0.0.0-255.255.255.255 rule under Networking > Firewall
+      rules, then either add a private endpoint in the vnet or restrict
+      access to the App Service's vnet-integration subnet via a vnet rule.
+  - ref: storage
+    severity: critical
+    title: "Storage account allows public blob access"
+    detail: >
+      Allow Blob Public Access is enabled at the account level, so any
+      container can be set to anonymous read and its blobs downloaded
+      without authentication.
+    recommendation: >
+      Set Configuration > Allow Blob Public Access to Disabled, and serve
+      content through the API (or SAS tokens) instead of anonymous URLs.
+  - ref: api
+    severity: critical
+    title: "App Service still accepts TLS 1.0"
+    detail: >
+      Minimum TLS version on contoso-api is 1.0. TLS 1.0/1.1 are deprecated,
+      fail current compliance baselines, and allow downgrade attacks on
+      clients negotiating with the API.
+    recommendation: >
+      Set minimum TLS to 1.2 under Configuration > General settings >
+      Minimum Inbound TLS Version.
+
+metadata:
+  Customer: "Contoso"
+  Workload: "contoso-api"
+  Engineer: "Allan Miller"
+  Session: "2026-06-09"
+  Environment: "production"

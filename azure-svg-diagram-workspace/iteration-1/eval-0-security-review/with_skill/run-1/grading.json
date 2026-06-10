@@ -1,0 +1,39 @@
+{
+  "eval_id": 0,
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "diagram.svg exists and parses as valid XML with an <svg> root element",
+      "passed": true,
+      "evidence": "exists=True, valid_xml=True, svg_root=True, size=22977"
+    },
+    {
+      "text": "The SVG embeds real Azure service icons (contains <symbol> definitions with <use> references, not placeholder rects) for App Service, Application Gateway, SQL, and Storage",
+      "passed": true,
+      "evidence": "symbols=4, uses=4, placeholders=0"
+    },
+    {
+      "text": "All three problem services (App Service, SQL database, storage account) carry a visual severity highlight: red (#d13438) or orange (#ca5010) ring/badge elements positioned at those resources",
+      "passed": true,
+      "evidence": "severity color occurrences: {'#d13438': 13, '#ca5010': 1} (rings+badges+legend expected; >=6 indicates per-resource highlights)"
+    },
+    {
+      "text": "A findings legend is rendered in the SVG (text 'Findings') listing all three issues with severity wording and an actionable fix/recommendation line for each",
+      "passed": true,
+      "evidence": "findings_panel=True, fix_lines=True, mentions tls/firewall/public-blob in text"
+    },
+    {
+      "text": "Findings are numbered, and each number appears both on the topology (badge) and in the legend",
+      "passed": true,
+      "evidence": "white badge numbers found: [1, 2, 3] (need 1-3; badges appear once on topology and once in legend)"
+    }
+  ],
+  "pass_count": 5,
+  "total": 5,
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 5,
+    "failed": 0,
+    "total": 5
+  }
+}
